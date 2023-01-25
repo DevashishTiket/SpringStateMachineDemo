@@ -1,9 +1,9 @@
 package com.example.statemachinedemo.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,7 @@ import org.springframework.data.annotation.Id;
 @Entity
 public class Payment {
   @Id
+  @GeneratedValue(strategy= GenerationType.IDENTITY)
   private Long id;
   @Enumerated(EnumType.STRING)
   private PaymentState state;

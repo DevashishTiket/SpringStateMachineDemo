@@ -6,6 +6,7 @@ import com.example.statemachinedemo.domain.PaymentState;
 import com.example.statemachinedemo.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class PaymentServiceImpl implements PaymentService{
+
+public class PaymentServiceImpl implements PaymentService {
+
   public static final String PAYMENT_ID_HEADER = "payment_id";
   private final PaymentRepository repository;
   private final StateMachineFactory<PaymentState, PaymentEvent> stateMachineFactory;
@@ -54,22 +57,27 @@ public class PaymentServiceImpl implements PaymentService{
 
     return sm;
   }
+
   private void sendEvent(Long paymentId, StateMachine<PaymentState, PaymentEvent> sm, PaymentEvent event){
     Message msg = MessageBuilder.withPayload(event)
-        .setHeader(PAYMENT_ID_HEADER, paymentId)
-        .build();
+            .setHeader(PAYMENT_ID_HEADER, paymentId)
+            .build();
 
     sm.sendEvent(msg);
   }
-  private StateMachine<PaymentState,PaymentEvent> build(Long paymentId){
-    Payment payment=repository.getOne(paymentId);
-    StateMachine<PaymentState,PaymentEvent> sm= stateMachineFactory.getStateMachine();
+
+  private StateMachine<PaymentState, PaymentEvent> build(Long paymentId){
+    Payment payment = repository.getOne(paymentId);
+
+    StateMachine<PaymentState, PaymentEvent> sm = stateMachineFactory.getStateMachine();
+
     sm.stop();
+
     sm.getStateMachineAccessor()
-        .doWithAllRegions(sma -> {
-          sma.addStateMachineInterceptor(paymentStateChangeInterceptor);
-          sma.resetStateMachine(new DefaultStateMachineContext<>(payment.getState(), null, null, null));
-        });
+            .doWithAllRegions(sma -> {
+              sma.addStateMachineInterceptor(paymentStateChangeInterceptor);
+              sma.resetStateMachine(new DefaultStateMachineContext<>(payment.getState(), null, null, null));
+            });
 
     sm.start();
 
