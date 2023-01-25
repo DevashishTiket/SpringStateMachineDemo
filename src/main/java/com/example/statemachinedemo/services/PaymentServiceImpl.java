@@ -4,7 +4,8 @@ import com.example.statemachinedemo.domain.Payment;
 import com.example.statemachinedemo.domain.PaymentEvent;
 import com.example.statemachinedemo.domain.PaymentState;
 import com.example.statemachinedemo.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
+
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
